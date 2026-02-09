@@ -21,7 +21,7 @@ def index():
 def demo():
     """Display all demo job data."""
     jobs = db.get_all_jobs()
-    return render_template('jobs.html', jobs=jobs, is_demo=True)
+    return render_template('analysis_page.html', jobs=jobs, is_demo=True)
 
 @app.route('/job/<int:job_id>')
 def job_detail(job_id):
