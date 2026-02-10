@@ -204,6 +204,46 @@
     .loading.active {
         display: block;
     }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 30px;
+        align-items: center;
+    }
+
+    .pagination-btn {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        background: white;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+        background: #f0f0f0;
+        border-color: #667eea;
+    }
+
+    .pagination-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .pagination-btn.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+
+    .pagination-info {
+        color: #666;
+        font-size: 14px;
+        margin: 0 10px;
+    }
 {% endblock %}
 
 {% block content %}
@@ -224,7 +264,7 @@
     </div>
 
     {% if jobs %}
-        <div class="jobs-container">
+        <div class="jobs-container" id="jobsContainer">
             {% for job in jobs %}
             <div class="job-card">
                 <div class="job-title">{{ job.title }}</div>
@@ -260,9 +300,104 @@
             ❌ No jobs found. Please check back later.
         </div>
     {% endif %}
+
+    <div id="paginationContainer"></div>
 </div>
 
 <script>
+let displayedJobs = [];
+let currentPage = 1;
+const JOBS_PER_PAGE = 4;
+
+// Function to render pagination controls
+function renderPagination(totalJobs) {
+    const paginationContainer = document.getElementById('paginationContainer');
+    
+    if (totalJobs <= JOBS_PER_PAGE) {
+        paginationContainer.innerHTML = '';
+        return;
+    }
+    
+    const totalPages = Math.ceil(totalJobs / JOBS_PER_PAGE);
+    let paginationHTML = '<div class="pagination">';
+    
+    // Previous button
+    paginationHTML += `<button class="pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">← Previous</button>`;
+    
+    // Page numbers
+    paginationHTML += `<span class="pagination-info">Page ${currentPage} of ${totalPages}</span>`;
+    
+    // Next button
+    paginationHTML += `<button class="pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">Next →</button>`;
+    
+    paginationHTML += '</div>';
+    paginationContainer.innerHTML = paginationHTML;
+}
+
+function goToPage(pageNumber) {
+    const totalPages = Math.ceil(displayedJobs.length / JOBS_PER_PAGE);
+    
+    if (pageNumber < 1 || pageNumber > totalPages) {
+        return;
+    }
+    
+    currentPage = pageNumber;
+    renderJobCards(displayedJobs);
+}
+
+// Function to render job cards
+function renderJobCards(jobs) {
+    const jobsContainer = document.getElementById('jobsContainer');
+    
+    if (!jobs || jobs.length === 0) {
+        jobsContainer.innerHTML = '<div class="error">❌ No jobs found matching your criteria.</div>';
+        renderPagination(0);
+        return;
+    }
+    
+    // Calculate pagination
+    const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
+    const startIndex = (currentPage - 1) * JOBS_PER_PAGE;
+    const endIndex = Math.min(startIndex + JOBS_PER_PAGE, jobs.length);
+    const paginatedJobs = jobs.slice(startIndex, endIndex);
+    
+    let jobsHTML = '';
+    for (let job of paginatedJobs) {
+        jobsHTML += `
+            <div class="job-card">
+                <div class="job-title">${job.title}</div>
+                <div class="job-company">${job.company}</div>
+                
+                <div class="job-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">📍 Location:</span>
+                        <span>${job.location}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">💰 Salary:</span>
+                        <span>${job.pay}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">📅 Posted:</span>
+                        <span>${job.posting_date}</span>
+                    </div>
+                </div>
+
+                <div class="job-description">
+                    ${job.description}
+                </div>
+
+                <div class="job-actions">
+                    <a href="/job/${job.id}" class="btn-secondary">View Details</a>
+                </div>
+            </div>
+        `;
+    }
+    
+    jobsContainer.innerHTML = jobsHTML;
+    renderPagination(jobs.length);
+}
+
 async function submitQuery() {
     const queryInput = document.getElementById('queryInput');
     const query = queryInput.value.trim();
@@ -274,6 +409,9 @@ async function submitQuery() {
     
     const loadingIndicator = document.getElementById('loadingIndicator');
     const analysisContent = document.getElementById('analysisContent');
+    
+    // Reset pagination
+    currentPage = 1;
     
     // Show loading state
     loadingIndicator.classList.add('active');
@@ -293,13 +431,17 @@ async function submitQuery() {
         if (response.ok) {
             loadingIndicator.classList.remove('active');
             analysisContent.textContent = data.analysis;
+            displayedJobs = data.filtered_jobs || [];
+            renderJobCards(displayedJobs);
         } else {
             loadingIndicator.classList.remove('active');
             analysisContent.textContent = 'Error: ' + (data.error || 'Analysis failed');
+            renderJobCards([]);
         }
     } catch (error) {
         loadingIndicator.classList.remove('active');
         analysisContent.textContent = 'Error: ' + error.message;
+        renderJobCards([]);
     }
 }
 

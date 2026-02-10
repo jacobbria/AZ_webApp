@@ -12,7 +12,7 @@ DEMO_JOBS = [
         'location': 'Remote',
         'pay': '$120,000 - $160,000',
         'posting_date': '2025-02-01',
-        'description': 'We are looking for an experienced Python developer to join our growing team. 5+ years of experience required.'
+        'description': 'We are looking for an experienced Python developer to join our growing team. 5+ years of experience required. Work on backend systems and APIs.'
     },
     {
         'title': 'Full Stack Web Developer',
@@ -20,7 +20,7 @@ DEMO_JOBS = [
         'location': 'San Francisco, CA',
         'pay': '$100,000 - $140,000',
         'posting_date': '2025-02-05',
-        'description': 'Build scalable web applications with React, Node.js, and PostgreSQL. Work on cutting-edge projects.'
+        'description': 'Build scalable web applications with React, Node.js, and PostgreSQL. Work on cutting-edge projects. 3+ years experience.'
     },
     {
         'title': 'Data Scientist',
@@ -28,7 +28,7 @@ DEMO_JOBS = [
         'location': 'New York, NY',
         'pay': '$130,000 - $180,000',
         'posting_date': '2025-02-08',
-        'description': 'Join our ML team. Experience with Python, TensorFlow, and AWS required.'
+        'description': 'Join our ML team. Experience with Python, TensorFlow, and AWS required. Build machine learning models for production.'
     },
     {
         'title': 'DevOps Engineer',
@@ -36,7 +36,7 @@ DEMO_JOBS = [
         'location': 'Austin, TX',
         'pay': '$110,000 - $150,000',
         'posting_date': '2025-02-06',
-        'description': 'Manage CI/CD pipelines, Kubernetes, and cloud infrastructure. 3+ years of DevOps experience.'
+        'description': 'Manage CI/CD pipelines, Kubernetes, and cloud infrastructure. 3+ years of DevOps experience. Docker and Terraform skills needed.'
     },
     {
         'title': 'Frontend Developer (React)',
@@ -44,7 +44,7 @@ DEMO_JOBS = [
         'location': 'Los Angeles, CA',
         'pay': '$90,000 - $130,000',
         'posting_date': '2025-02-04',
-        'description': 'Create beautiful, responsive UIs with React and TypeScript. Strong focus on user experience.'
+        'description': 'Create beautiful, responsive UIs with React and TypeScript. Strong focus on user experience. 2+ years React experience.'
     },
     {
         'title': 'Software Architect',
@@ -52,7 +52,159 @@ DEMO_JOBS = [
         'location': 'Boston, MA',
         'pay': '$140,000 - $180,000',
         'posting_date': '2025-02-07',
-        'description': 'Design large-scale systems. 10+ years of software development experience. Leadership skills required.'
+        'description': 'Design large-scale systems. 10+ years of software development experience. Leadership skills required. Microservices architecture.'
+    },
+    {
+        'title': 'Java Backend Engineer',
+        'company': 'FinTech Innovations',
+        'location': 'New York, NY',
+        'pay': '$115,000 - $155,000',
+        'posting_date': '2025-02-09',
+        'description': 'Build robust backend services with Java and Spring Boot. 4+ years experience. Financial systems knowledge a plus.'
+    },
+    {
+        'title': 'Cloud Architect',
+        'company': 'CloudSync Corp',
+        'location': 'Seattle, WA',
+        'pay': '$135,000 - $175,000',
+        'posting_date': '2025-02-08',
+        'description': 'Design and implement cloud infrastructure solutions. AWS, Azure, or GCP expertise required. 6+ years experience.'
+    },
+    {
+        'title': 'Mobile App Developer (iOS)',
+        'company': 'AppCreators Inc.',
+        'location': 'Remote',
+        'pay': '$95,000 - $135,000',
+        'posting_date': '2025-02-07',
+        'description': 'Develop native iOS applications with Swift. 3+ years iOS development experience. App Store deployment knowledge.'
+    },
+    {
+        'title': 'Android Developer',
+        'company': 'MobileTech Solutions',
+        'location': 'Mountain View, CA',
+        'pay': '$100,000 - $140,000',
+        'posting_date': '2025-02-06',
+        'description': 'Build Android apps with Kotlin and Java. 3+ years Android experience. Play Store publishing experience required.'
+    },
+    {
+        'title': 'Machine Learning Engineer',
+        'company': 'AI Research Labs',
+        'location': 'Berkeley, CA',
+        'pay': '$140,000 - $190,000',
+        'posting_date': '2025-02-09',
+        'description': 'Develop ML models for computer vision. PyTorch and TensorFlow expertise. PhD preferred, MSc acceptable.'
+    },
+    {
+        'title': 'Security Engineer',
+        'company': 'CyberShield Inc.',
+        'location': 'Washington, DC',
+        'pay': '$120,000 - $160,000',
+        'posting_date': '2025-02-08',
+        'description': 'Implement security protocols and penetration testing. 5+ years cybersecurity experience. CISSP certification preferred.'
+    },
+    {
+        'title': 'Database Administrator',
+        'company': 'DataFlow Systems',
+        'location': 'Chicago, IL',
+        'pay': '$105,000 - $145,000',
+        'posting_date': '2025-02-07',
+        'description': 'Manage and optimize PostgreSQL and MongoDB databases. 4+ years DBA experience. Query optimization expertise.'
+    },
+    {
+        'title': 'QA Automation Engineer',
+        'company': 'TestPro Solutions',
+        'location': 'Remote',
+        'pay': '$85,000 - $120,000',
+        'posting_date': '2025-02-06',
+        'description': 'Write automated tests with Selenium and Cypress. 3+ years QA automation experience. CI/CD pipeline knowledge.'
+    },
+    {
+        'title': 'Go Developer',
+        'company': 'SystemsCore',
+        'location': 'Remote',
+        'pay': '$110,000 - $150,000',
+        'posting_date': '2025-02-09',
+        'description': 'Build high-performance systems with Go. 2+ years Go experience. Concurrency and networking expertise.'
+    },
+    {
+        'title': 'Rust Developer',
+        'company': 'Systems Programming Co.',
+        'location': 'Portland, OR',
+        'pay': '$120,000 - $160,000',
+        'posting_date': '2025-02-08',
+        'description': 'Develop systems software with Rust. 2+ years Rust experience. Memory safety and performance optimization focus.'
+    },
+    {
+        'title': 'TypeScript / Node.js Developer',
+        'company': 'FullStack Tech',
+        'location': 'Denver, CO',
+        'pay': '$105,000 - $145,000',
+        'posting_date': '2025-02-07',
+        'description': 'Build scalable backend services with Node.js and TypeScript. 3+ years experience. Express.js or Nest.js knowledge.'
+    },
+    {
+        'title': 'Vue.js Frontend Developer',
+        'company': 'WebDynamics',
+        'location': 'Austin, TX',
+        'pay': '$95,000 - $135,000',
+        'posting_date': '2025-02-06',
+        'description': 'Build modern UIs with Vue.js 3. 2+ years Vue experience. State management with Vuex or Pinia.'
+    },
+    {
+        'title': 'C++ Systems Engineer',
+        'company': 'HighPerformance Systems',
+        'location': 'Mountain View, CA',
+        'pay': '$130,000 - $170,000',
+        'posting_date': '2025-02-09',
+        'description': 'Develop low-level systems software in C++. 5+ years C++ experience. Real-time systems knowledge.'
+    },
+    {
+        'title': 'Python Data Engineer',
+        'company': 'BigData Analytics',
+        'location': 'Remote',
+        'pay': '$115,000 - $155,000',
+        'posting_date': '2025-02-08',
+        'description': 'Design data pipelines with Python, Spark, and Kafka. 4+ years data engineering experience. ETL pipeline expertise.'
+    },
+    {
+        'title': 'GraphQL Developer',
+        'company': 'API Innovations',
+        'location': 'San Francisco, CA',
+        'pay': '$105,000 - $145,000',
+        'posting_date': '2025-02-07',
+        'description': 'Build GraphQL APIs and backend services. 2+ years GraphQL experience. Apollo or Hasura knowledge.'
+    },
+    {
+        'title': 'Infrastructure as Code Engineer',
+        'company': 'CloudOps Pro',
+        'location': 'Remote',
+        'pay': '$120,000 - $160,000',
+        'posting_date': '2025-02-06',
+        'description': 'Write infrastructure code with Terraform and CloudFormation. 4+ years IaC experience. AWS and multi-cloud expertise.'
+    },
+    {
+        'title': 'Blockchain Developer',
+        'company': 'CryptoTech Labs',
+        'location': 'Remote',
+        'pay': '$125,000 - $165,000',
+        'posting_date': '2025-02-09',
+        'description': 'Develop smart contracts with Solidity. 2+ years blockchain experience. Ethereum and Web3 knowledge required.'
+    },
+    {
+        'title': 'Game Developer (C#/Unity)',
+        'company': 'GameStudio Interactive',
+        'location': 'Los Angeles, CA',
+        'pay': '$100,000 - $140,000',
+        'posting_date': '2025-02-08',
+        'description': 'Create games with Unity and C#. 3+ years game development experience. 3D graphics and physics engine knowledge.'
+    },
+    {
+        'title': 'Technical Product Manager',
+        'company': 'TechProduct Ventures',
+        'location': 'New York, NY',
+        'pay': '$130,000 - $170,000',
+        'posting_date': '2025-02-07',
+        'description': 'Lead technical product strategy. 5+ years product/engineering experience. Data-driven product development expertise.'
     },
 ]
 

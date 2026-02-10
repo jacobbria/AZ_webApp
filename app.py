@@ -3,6 +3,7 @@ import os
 import logging
 from dotenv import load_dotenv
 import db
+import gemini_service
 
 # Load environment variables
 load_dotenv()
@@ -51,24 +52,41 @@ def analyze_query():
             logger.warning("Empty query submitted")
             return jsonify({'error': 'Query cannot be empty'}), 400
         
-        # Get all jobs for analysis
-        jobs = db.get_all_jobs()
-        logger.info(f"Retrieved {len(jobs)} jobs for analysis")
+        # Parse the query using Gemini
+        logger.info("Parsing natural language query with Gemini...")
+        parsed_filters = gemini_service.parse_query(query)
         
-        # Mock analysis response (placeholder for LLM integration)
-        analysis_result = f"Analysis complete: Found {len(jobs)} job postings matching your criteria."
+        if 'error' in parsed_filters:
+            logger.error(f"Error parsing query: {parsed_filters['error']}")
+            return jsonify({'error': parsed_filters['error']}), 500
+        
+        logger.info(f"Parsed filters: {parsed_filters}")
+        
+        # Get all jobs
+        all_jobs = db.get_all_jobs()
+        logger.info(f"Retrieved {len(all_jobs)} total jobs from database")
+        
+        # Filter jobs based on parsed criteria
+        filtered_jobs = gemini_service.filter_jobs(all_jobs, parsed_filters)
+        logger.info(f"After filtering: {len(filtered_jobs)} jobs match the criteria")
+        
+        # Use Gemini to analyze the filtered jobs
+        logger.info("Analyzing filtered jobs with Gemini...")
+        analysis = gemini_service.analyze_jobs(filtered_jobs, query, parsed_filters)
         
         logger.info(f"Analysis completed successfully for query: '{query}'")
         
         return jsonify({
             'success': True,
-            'analysis': analysis_result,
-            'job_count': len(jobs)
+            'analysis': analysis,
+            'job_count': len(filtered_jobs),
+            'filtered_jobs': filtered_jobs,
+            'filters': parsed_filters
         }), 200
         
     except Exception as e:
         logger.error(f"Error processing analysis query: {str(e)}", exc_info=True)
-        return jsonify({'error': 'Analysis failed'}), 500
+        return jsonify({'error': 'Analysis failed: ' + str(e)}), 500
 
 @app.route('/job/<int:job_id>')
 def job_detail(job_id):
