@@ -193,20 +193,32 @@
         font-weight: 500;
         margin-bottom: 15px;
     }
+
+    .loading {
+        display: none;
+        text-align: center;
+        color: #667eea;
+        font-style: italic;
+    }
+
+    .loading.active {
+        display: block;
+    }
 {% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="query-section">
         <div class="query-input-group">
-            <input type="text" class="query-input" placeholder="Ask a question about the job postings...">
-            <button class="query-button">Analyze</button>
+            <input type="text" id="queryInput" class="query-input" placeholder="Ask a question about the job postings...">
+            <button class="query-button" onclick="submitQuery()">Analyze</button>
         </div>
+        <div class="loading" id="loadingIndicator">Analyzing...</div>
     </div>
 
-    <div class="analysis-results">
+    <div class="analysis-results" id="analysisResults">
         <div class="analysis-title">Analysis Results</div>
-        <div class="analysis-content">
+        <div class="analysis-content" id="analysisContent">
             Ready to analyze. Enter a natural language query above to get insights on job postings.
         </div>
     </div>
@@ -249,4 +261,58 @@
         </div>
     {% endif %}
 </div>
+
+<script>
+async function submitQuery() {
+    const queryInput = document.getElementById('queryInput');
+    const query = queryInput.value.trim();
+    
+    if (!query) {
+        alert('Please enter a query');
+        return;
+    }
+    
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const analysisContent = document.getElementById('analysisContent');
+    
+    // Show loading state
+    loadingIndicator.classList.add('active');
+    analysisContent.textContent = '';
+    
+    try {
+        const response = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ query: query })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            loadingIndicator.classList.remove('active');
+            analysisContent.textContent = data.analysis;
+        } else {
+            loadingIndicator.classList.remove('active');
+            analysisContent.textContent = 'Error: ' + (data.error || 'Analysis failed');
+        }
+    } catch (error) {
+        loadingIndicator.classList.remove('active');
+        analysisContent.textContent = 'Error: ' + error.message;
+    }
+}
+
+// Allow Enter key to submit
+document.addEventListener('DOMContentLoaded', function() {
+    const queryInput = document.getElementById('queryInput');
+    if (queryInput) {
+        queryInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                submitQuery();
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
