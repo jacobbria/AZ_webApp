@@ -8,6 +8,9 @@ import gemini_service
 # Load environment variables
 load_dotenv()
 
+# Load API keys
+gemini_key = os.getenv("GEMINI_API_KEY")
+
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'dev-key-change-in-production')
 

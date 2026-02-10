@@ -1,0 +1,41 @@
+name: Deploy Resume App
+
+on:
+  push:
+    branches: [ main ]  # This triggers the script every time you push to main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Execute Remote Deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_IP }}
+          username: ${{ secrets.VM_USER }}
+          password: ${{ secrets.VM_PASSWORD }}
+          script: |
+            # 1. Create a unique folder name using a timestamp
+            NEW_REL=~/releases/$(date +%Y%m%d%H%M%S)
+            mkdir -p $NEW_REL
+            
+            # 2. Clone the latest code into that new folder
+            git clone https://github.com/${{ github.repository }}.git $NEW_REL
+            
+            # 3. Set up the virtual environment & install requirements
+            cd $NEW_REL
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install -r requirements.txt
+            
+            # 4. Inject the Gemini Key into a .env file for the app to read
+            echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+            
+            # 5. THE ATOMIC SWAP: Point the 'app_current' link to the new folder
+            ln -sfn $NEW_REL ~/app_current
+            
+            # 6. Restart the service to pick up the changes
+            sudo systemctl restart jobapp
