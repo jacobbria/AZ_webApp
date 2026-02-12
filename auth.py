@@ -6,13 +6,50 @@ import msal
 import os
 from dotenv import load_dotenv
 import logging
+from azure.identity import DefaultAzureCredential
+from azure.keyvault.secrets import SecretClient
 
 load_dotenv()
 logger = logging.getLogger(__name__)
 
+
+def get_secret(secret_name, fallback_env_var=None):
+    """
+    Retrieve a secret from Azure Key Vault, with fallback to environment variable.
+    
+    Args:
+        secret_name: Name of the secret in Key Vault
+        fallback_env_var: Environment variable to use as fallback
+    
+    Returns:
+        str: The secret value, or None if not found
+    """
+    # Try to get from Key Vault first
+    try:
+        key_vault_url = os.getenv('AZURE_KEYVAULT_URL')
+        if key_vault_url:
+            credential = DefaultAzureCredential()
+            client = SecretClient(vault_url=key_vault_url, credential=credential)
+            secret = client.get_secret(secret_name)
+            print(f"[KEY_VAULT] ✓ Successfully retrieved '{secret_name}' from Azure Key Vault")
+            return secret.value
+    except Exception as e:
+        print(f"[KEY_VAULT] ⚠ Could not retrieve '{secret_name}' from Key Vault: {e}")
+    
+    # Fallback to environment variable
+    if fallback_env_var:
+        env_value = os.getenv(fallback_env_var)
+        if env_value:
+            print(f"[KEY_VAULT] Using fallback environment variable: {fallback_env_var}")
+            return env_value
+    
+    print(f"[KEY_VAULT] ❌ Could not retrieve '{secret_name}' from Key Vault or environment variables")
+    return None
+
+
 # MSAL Configuration
 CLIENT_ID = os.getenv('ENTRA_CLIENT_ID')
-CLIENT_SECRET = os.getenv('ENTRA_CLIENT_SECRET')
+CLIENT_SECRET = get_secret('EntraClientSecret', 'EntraClientSecret')
 AUTHORITY = os.getenv('ENTRA_AUTHORITY', 'https://login.microsoftonline.com/common')
 REDIRECT_URI = os.getenv('ENTRA_REDIRECT_URI', 'http://localhost:8000/auth/callback')
 
