@@ -183,24 +183,34 @@
     </footer>
 
     <script>
-        // Minimum loading screen duration in milliseconds
+        // Minimum loading screen duration in milliseconds - only on first load
         const MIN_LOADING_TIME = 3500; // 3.5 seconds
         let pageLoadTime = null;
         let minTimeElapsed = false;
 
-        // Mark when 5 seconds have passed
-        setTimeout(function() {
-            minTimeElapsed = true;
-            // If page already loaded, hide the loading screen now
-            if (pageLoadTime !== null) {
-                hideLoadingScreen();
-            }
-        }, MIN_LOADING_TIME);
+        // Check if this is the first page load
+        const isFirstLoad = !sessionStorage.getItem('pageLoaded');
 
-        // Hide loading screen when page is fully loaded (but respect minimum time)
+        // Mark when 3.5 seconds have passed (only enforce on first load)
+        if (isFirstLoad) {
+            setTimeout(function() {
+                minTimeElapsed = true;
+                // If page already loaded, hide the loading screen now
+                if (pageLoadTime !== null) {
+                    hideLoadingScreen();
+                }
+            }, MIN_LOADING_TIME);
+        } else {
+            // For subsequent loads, no minimum time
+            minTimeElapsed = true;
+        }
+
+        // Hide loading screen when page is fully loaded (but respect minimum time on first load)
         window.addEventListener('load', function() {
             pageLoadTime = Date.now();
-            // If minimum time has passed, hide immediately
+            // Mark that we've loaded a page
+            sessionStorage.setItem('pageLoaded', 'true');
+            // If minimum time has passed or this isn't first load, hide immediately
             if (minTimeElapsed) {
                 hideLoadingScreen();
             }
