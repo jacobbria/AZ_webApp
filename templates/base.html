@@ -163,21 +163,35 @@
     </footer>
 
     <script>
-        // Hide loading screen when page is fully loaded
+        // Minimum loading screen duration in milliseconds
+        const MIN_LOADING_TIME = 5000; // 5 seconds
+        let pageLoadTime = null;
+        let minTimeElapsed = false;
+
+        // Mark when 5 seconds have passed
+        setTimeout(function() {
+            minTimeElapsed = true;
+            // If page already loaded, hide the loading screen now
+            if (pageLoadTime !== null) {
+                hideLoadingScreen();
+            }
+        }, MIN_LOADING_TIME);
+
+        // Hide loading screen when page is fully loaded (but respect minimum time)
         window.addEventListener('load', function() {
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen) {
-                loadingScreen.classList.add('hidden');
+            pageLoadTime = Date.now();
+            // If minimum time has passed, hide immediately
+            if (minTimeElapsed) {
+                hideLoadingScreen();
             }
         });
 
-        // Fallback: Hide after 5 seconds if resources take too long
-        setTimeout(function() {
+        function hideLoadingScreen() {
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
                 loadingScreen.classList.add('hidden');
             }
-        }, 5000);
+        }
     </script>
 </body>
 </html>
