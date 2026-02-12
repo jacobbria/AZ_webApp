@@ -92,6 +92,94 @@
         transform: translateY(-3px);
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
     }
+
+    .auth-status-container {
+        margin-top: 50px;
+        padding: 20px;
+        border-radius: 8px;
+        animation: popup 0.8s ease-out 0.3s both;
+    }
+
+    .auth-status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        font-size: 16px;
+    }
+
+    .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse 2s infinite;
+    }
+
+    .status-indicator.authenticated {
+        background-color: #4CAF50;
+        box-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
+    }
+
+    .status-indicator.not-authenticated {
+        background-color: #cccccc;
+        box-shadow: 0 0 10px rgba(204, 204, 204, 0.4);
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    .auth-status-text {
+        font-weight: 500;
+    }
+
+    .auth-status-text.authenticated {
+        color: #4CAF50;
+    }
+
+    .auth-status-text.not-authenticated {
+        color: #999999;
+    }
+
+    .auth-buttons {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .auth-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .auth-button.login {
+        background-color: #667eea;
+        color: white;
+    }
+
+    .auth-button.login:hover {
+        background-color: #5568d3;
+    }
+
+    .auth-button.logout {
+        background-color: #ff6b6b;
+        color: white;
+    }
+
+    .auth-button.logout:hover {
+        background-color: #ff5252;
+    }
+
 {% endblock %}
 
 {% block content %}
@@ -100,6 +188,71 @@
         <div class="greeting">Mimis</div>
         <div class="subtitle">Generate insights on job postings using natural language</div>
         <a href="/demo" class="demo-button">Use Demo Data</a>
+
+        <!-- Authentication Status Indicator -->
+        <div class="auth-status-container">
+            <div class="auth-status">
+                <span class="status-indicator" id="statusIndicator"></span>
+                <span class="auth-status-text" id="statusText"></span>
+            </div>
+            <div class="auth-buttons">
+                <a href="#" id="authButton" class="auth-button"></a>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+    // Check authentication status on page load
+    async function checkAuthStatus() {
+        try {
+            const response = await fetch('/api/auth/status');
+            const data = await response.json();
+            
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            const authButton = document.getElementById('authButton');
+            
+            if (data.authenticated) {
+                // User is authenticated
+                statusIndicator.classList.add('authenticated');
+                statusIndicator.classList.remove('not-authenticated');
+                statusText.classList.add('authenticated');
+                statusText.classList.remove('not-authenticated');
+                statusText.textContent = `✓ Entra ID Authenticated (${data.user_name})`;
+                authButton.classList.add('logout');
+                authButton.classList.remove('login');
+                authButton.href = '/auth/logout';
+                authButton.textContent = 'Logout';
+            } else {
+                // User is not authenticated
+                statusIndicator.classList.add('not-authenticated');
+                statusIndicator.classList.remove('authenticated');
+                statusText.classList.add('not-authenticated');
+                statusText.classList.remove('authenticated');
+                statusText.textContent = 'Entra ID Not Authenticated';
+                authButton.classList.add('login');
+                authButton.classList.remove('logout');
+                authButton.href = '/auth/login';
+                authButton.textContent = 'Login with Entra ID';
+            }
+        } catch (error) {
+            console.error('Error checking auth status:', error);
+            // Default to not authenticated if check fails
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            const authButton = document.getElementById('authButton');
+            
+            statusIndicator.classList.add('not-authenticated');
+            statusText.classList.add('not-authenticated');
+            statusText.textContent = 'Entra ID Not Authenticated';
+            authButton.classList.add('login');
+            authButton.href = '/auth/login';
+            authButton.textContent = 'Login with Entra ID';
+        }
+    }
+
+    // Check auth status when page loads
+    document.addEventListener('DOMContentLoaded', checkAuthStatus);
+</script>
 {% endblock %}
