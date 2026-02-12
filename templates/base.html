@@ -94,10 +94,56 @@
             margin: 20px 0;
         }
 
+        /* Loading Screen Styles */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, #3d2a6f 0%, #667eea 25%, #764ba2 50%, #667eea 75%, #3d2a6f 100%);
+            background-size: 200% 200%;
+            animation: bg-rotate 12s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-screen img {
+            max-width: 300px;
+            max-height: 300px;
+            width: auto;
+            height: auto;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+        }
+
         {% block custom_styles %}{% endblock %}
     </style>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <img src="{{ url_for('static', filename='images/loading.png') }}" alt="Loading...">
+    </div>
+
     <header>
         <h1>📊 Job Trends Dashboard</h1>
         <p>Explore trending job postings with demo data</p>
@@ -115,5 +161,23 @@
     <footer>
         <p>&copy; 2025 Resume Trend App. Hosted on Azure.</p>
     </footer>
+
+    <script>
+        // Hide loading screen when page is fully loaded
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.classList.add('hidden');
+            }
+        });
+
+        // Fallback: Hide after 5 seconds if resources take too long
+        setTimeout(function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
+                loadingScreen.classList.add('hidden');
+            }
+        }, 5000);
+    </script>
 </body>
 </html>
