@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 import os
 import logging
 from dotenv import load_dotenv
 import db
 import gemini_service
+import auth
 
 # Load environment variables
 load_dotenv()
@@ -28,7 +29,8 @@ db.init_db()
 def index():
     """Home page with greeting and demo data button."""
     logger.info("Index page accessed")
-    return render_template('index.html')
+    is_authenticated = auth.is_authenticated(session)
+    return render_template('index.html', is_authenticated=is_authenticated)
 
 @app.route('/demo')
 def demo():
@@ -121,6 +123,104 @@ def not_found(error):
 def server_error(error):
     logger.error(f"500 server error: {str(error)}", exc_info=True)
     return render_template('error.html', message='Server error'), 500
+
+# ===== Authentication Routes =====
+
+@app.route('/auth/login')
+def auth_login():
+    """Initiates Entra ID login flow."""
+    print("\n[LOGIN] ===== AUTH LOGIN INITIATED =====")
+    print(f"[LOGIN] Getting authorization URL from MSAL...")
+    logger.info("User initiated login")
+    auth_url = auth.get_auth_url()
+    print(f"[LOGIN] ✓ Authorization URL generated")
+    print(f"[LOGIN] Redirecting to: {auth_url[:100]}...")
+    return redirect(auth_url)
+
+
+@app.route('/auth/callback')
+def auth_callback():
+    """Handles Entra ID callback after user authentication."""
+    try:
+        print("\n[CALLBACK] ===== AUTH CALLBACK RECEIVED =====")
+        code = request.args.get('code')
+        session_state = request.args.get('session_state')
+        error = request.args.get('error')
+        error_description = request.args.get('error_description')
+        
+        print(f"[CALLBACK] URL Parameters:")
+        print(f"[CALLBACK] Code: {code[:50]}..." if code else "[CALLBACK] No code")
+        print(f"[CALLBACK] Session State: {session_state}")
+        print(f"[CALLBACK] Error: {error}")
+        print(f"[CALLBACK] Error Description: {error_description}")
+        
+        if error:
+            print(f"[CALLBACK] ✗ ERROR from Microsoft: {error} - {error_description}")
+            logger.warning(f"Auth error from Microsoft: {error} - {error_description}")
+            return redirect(url_for('index'))
+        
+        if not code:
+            print(f"[CALLBACK] ✗ No authorization code received in callback")
+            logger.warning("No authorization code received in callback")
+            return redirect(url_for('index'))
+        
+        print(f"[CALLBACK] Exchanging code for token...")
+        # Exchange code for token
+        token_response = auth.acquire_token_by_auth_code(code)
+        
+        print(f"[CALLBACK] Token response keys: {token_response.keys() if isinstance(token_response, dict) else 'Not a dict'}")
+        
+        if 'error' in token_response:
+            print(f"[CALLBACK] ✗ Token acquisition FAILED")
+            print(f"[CALLBACK] Error: {token_response.get('error')}")
+            print(f"[CALLBACK] Description: {token_response.get('error_description')}")
+            logger.error(f"Token acquisition failed: {token_response.get('error_description')}")
+            return redirect(url_for('index'))
+        
+        print(f"[CALLBACK] ✓ Token acquired successfully!")
+        # Store token in session
+        session['access_token'] = token_response.get('access_token')
+        session['user_id'] = token_response.get('id_token_claims', {}).get('oid')
+        session['user_name'] = token_response.get('id_token_claims', {}).get('name')
+        
+        print(f"[CALLBACK] Stored in session:")
+        print(f"[CALLBACK] - Access Token: {'Yes' if session.get('access_token') else 'No'}")
+        print(f"[CALLBACK] - User ID: {session.get('user_id')}")
+        print(f"[CALLBACK] - User Name: {session.get('user_name')}")
+        
+        logger.info(f"User authenticated successfully: {session.get('user_name')}")
+        print(f"[CALLBACK] ✓ Authentication successful! Redirecting to home page...")
+        return redirect(url_for('index'))
+        
+    except Exception as e:
+        print(f"[CALLBACK] ✗ EXCEPTION in auth callback:")
+        print(f"[CALLBACK] Exception Type: {type(e).__name__}")
+        print(f"[CALLBACK] Exception Message: {str(e)}")
+        import traceback
+        print(f"[CALLBACK] Traceback:\n{traceback.format_exc()}")
+        logger.error(f"Error in auth callback: {str(e)}", exc_info=True)
+        return redirect(url_for('index'))
+
+
+@app.route('/auth/logout')
+def auth_logout():
+    """Logs out the user by clearing session."""
+    session.clear()
+    logger.info("User logged out")
+    return redirect(url_for('index'))
+
+
+@app.route('/api/auth/status')
+def auth_status():
+    """API endpoint to check authentication status."""
+    is_authenticated = auth.is_authenticated(session)
+    user_name = session.get('user_name', 'Unknown User') if is_authenticated else None
+    
+    return jsonify({
+        'authenticated': is_authenticated,
+        'user_name': user_name,
+        'user_id': session.get('user_id') if is_authenticated else None
+    }), 200
 
 if __name__ == '__main__':
     # Note: In production, use Gunicorn instead of Flask's development server
