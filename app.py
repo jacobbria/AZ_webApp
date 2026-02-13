@@ -16,12 +16,20 @@ gemini_key = os.getenv("GEMINI_API_KEY")
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'dev-key-change-in-production')
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# Configure logging - safe for gunicorn multi-worker environment
+if __name__ != '__main__':
+    # In production (gunicorn), let gunicorn handle logging
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
+    logger = app.logger
+else:
+    # In development, use basicConfig
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    logger = logging.getLogger(__name__)
 
 # Initialize database on startup
 db.init_db()
