@@ -149,6 +149,225 @@
             }
             50% {
                 opacity: 0.7;
+                transform: scale(0.95);
+            }
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 8px 12px;
+            background: transparent;
+            border-bottom: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Hamburger Menu Button */
+        .hamburger-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            padding: 0;
+            border: none;
+            background: transparent;
+            width: 48px;
+            height: 48px;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn span {
+            width: 28px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn:hover span {
+            background: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.8);
+        }
+
+        /* Sidebar Menu */
+        .sidebar {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(102, 80, 180, 0.98) 0%, rgba(130, 100, 200, 0.98) 100%);
+            z-index: 999;
+            transition: left 0.3s ease;
+            padding-top: 80px;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 16px 24px;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover:not(.disabled) {
+            background: rgba(255, 255, 255, 0.2);
+            border-left-color: white;
+            padding-left: 28px;
+        }
+
+        .sidebar-menu a.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .sidebar-menu a.disabled:hover {
+            background: none;
+            border-left-color: transparent;
+            padding-left: 24px;
+        }
+
+        /* Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .navbar-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .auth-icon-button {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            background: transparent;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            font-size: 24px;
+            font-weight: 600;
+            color: white;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% {
+                box-shadow: 0 0 15px #667eea, 0 0 30px rgba(102, 126, 234, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 25px #667eea, 0 0 50px rgba(102, 126, 234, 0.9);
+            }
+        }
+
+        @keyframes pulse-red {
+            0%, 100% {
+                box-shadow: 0 0 15px #ff0000, 0 0 30px rgba(255, 0, 0, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 25px #ff0000, 0 0 50px rgba(255, 0, 0, 0.9);
+            }
+        }
+
+        .auth-icon-button.authenticated {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            animation: pulse-green 2s ease-in-out infinite;
+        }
+
+        .auth-icon-button.not-authenticated {
+            background: #ff0000;
+            animation: pulse-red 2s ease-in-out infinite;
+        }
+
+        .auth-icon-button:hover {
+            transform: scale(1.15);
+            filter: brightness(1.2);
+        }
+
+        .auth-icon-button.authenticated:hover {
+            box-shadow: 0 0 20px #00ff00, 0 0 40px rgba(0, 255, 0, 0.8);
+        }
+
+        .auth-icon-button.not-authenticated:hover {
+            box-shadow: 0 0 20px #ff0000, 0 0 40px rgba(255, 0, 0, 0.8);
+        }
+
+        .auth-tooltip {
+            position: absolute;
+            bottom: -40px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            transform: translateY(-5px);
+        }
+
+        .auth-icon-button:hover .auth-tooltip {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
                 transform: scale(1.05);
             }
         }
@@ -157,6 +376,35 @@
     </style>
 </head>
 <body>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="/" onclick="toggleSidebar()">Home</a></li>
+            <li><a href="/jobs/add" id="addJobLink" onclick="toggleSidebar()">Add Job</a></li>
+            <li><a href="/data" id="queryJobLink" onclick="toggleSidebar()">Query Job</a></li>
+        </ul>
+    </div>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="navbar-section">
+            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()" title="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        <div class="navbar-section">
+            <button class="auth-icon-button" id="authIconButton" title="Authentication">
+                👤
+                <div class="auth-tooltip" id="authTooltip"></div>
+            </button>
+        </div>
+    </div>
+
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-content">
@@ -222,6 +470,114 @@
                 loadingScreen.classList.add('hidden');
             }
         }
+
+        // Toggle sidebar function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (sidebar) {
+                sidebar.classList.toggle('open');
+            }
+            if (overlay) {
+                overlay.classList.toggle('open');
+            }
+        }
+
+        // Check authentication status
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/api/auth/status');
+                const data = await response.json();
+                
+                const authIconButton = document.getElementById('authIconButton');
+                const authTooltip = document.getElementById('authTooltip');
+                const addJobLink = document.getElementById('addJobLink');
+                const queryJobLink = document.getElementById('queryJobLink');
+                const customDataBtn = document.getElementById('customDataBtn');
+                
+                if (data.authenticated) {
+                    // User is authenticated - green button
+                    authIconButton.classList.add('authenticated');
+                    authIconButton.classList.remove('not-authenticated');
+                    authTooltip.textContent = `Signout (${data.user_name})`;
+                    authIconButton.onclick = () => window.location.href = '/auth/logout';
+                    
+                    // Enable menu items for authenticated users
+                    if (addJobLink) {
+                        addJobLink.classList.remove('disabled');
+                        addJobLink.onclick = null;
+                    }
+                    if (queryJobLink) {
+                        queryJobLink.classList.remove('disabled');
+                        queryJobLink.onclick = null;
+                    }
+                    
+                    // Enable custom data button for authenticated users
+                    if (customDataBtn) {
+                        customDataBtn.disabled = false;
+                    }
+                } else {
+                    // User is not authenticated - red button
+                    authIconButton.classList.add('not-authenticated');
+                    authIconButton.classList.remove('authenticated');
+                    authTooltip.textContent = 'Login';
+                    authIconButton.onclick = () => window.location.href = '/auth/login';
+                    
+                    // Disable menu items for unauthenticated users
+                    if (addJobLink) {
+                        addJobLink.classList.add('disabled');
+                        addJobLink.onclick = (e) => e.preventDefault();
+                    }
+                    if (queryJobLink) {
+                        queryJobLink.classList.add('disabled');
+                        queryJobLink.onclick = (e) => e.preventDefault();
+                    }
+                    
+                    // Disable custom data button for unauthenticated users
+                    if (customDataBtn) {
+                        customDataBtn.disabled = true;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                // Default to not authenticated if check fails
+                const authIconButton = document.getElementById('authIconButton');
+                const authTooltip = document.getElementById('authTooltip');
+                const addJobLink = document.getElementById('addJobLink');
+                const queryJobLink = document.getElementById('queryJobLink');
+                const customDataBtn = document.getElementById('customDataBtn');
+                
+                authIconButton.classList.add('not-authenticated');
+                authIconButton.classList.remove('authenticated');
+                authTooltip.textContent = 'Login';
+                authIconButton.onclick = () => window.location.href = '/auth/login';
+                
+                if (addJobLink) {
+                    addJobLink.classList.add('disabled');
+                    addJobLink.onclick = (e) => e.preventDefault();
+                }
+                if (queryJobLink) {
+                    queryJobLink.classList.add('disabled');
+                    queryJobLink.onclick = (e) => e.preventDefault();
+                }
+                
+                if (customDataBtn) {
+                    customDataBtn.disabled = true;
+                }
+            }
+        }
+
+        // Initialize navbar when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+            
+            // Close sidebar when clicking overlay
+            const overlay = document.getElementById('sidebarOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', toggleSidebar);
+            }
+        });
     </script>
 </body>
 </html>
