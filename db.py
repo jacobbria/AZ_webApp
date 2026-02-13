@@ -226,10 +226,7 @@ def init_db():
             pay TEXT,
             posting_date TEXT,
             description TEXT,
-            skills TEXT DEFAULT 'unknown',
-            user_id TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     
@@ -241,38 +238,6 @@ def init_db():
                 INSERT INTO jobs (title, company, location, pay, posting_date, description)
                 VALUES (?, ?, ?, ?, ?, ?)
             ''', (job['title'], job['company'], job['location'], job['pay'], job['posting_date'], job['description']))
-    
-    conn.commit()
-    conn.close()
-    
-    # Ensure all required columns exist
-    ensure_columns_exist()
-
-def ensure_columns_exist():
-    """Check if all required columns exist in jobs table, add them if not."""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    # Get existing columns
-    cursor.execute("PRAGMA table_info(jobs)")
-    existing_columns = {row[1] for row in cursor.fetchall()}
-    
-    # Define required columns and their definitions
-    required_columns = {
-        'user_id': 'TEXT',
-        'created_at': 'TIMESTAMP',
-        'updated_at': 'TIMESTAMP',
-        'skills': "TEXT DEFAULT 'unknown'"
-    }
-    
-    # Add missing columns
-    for column_name, column_def in required_columns.items():
-        if column_name not in existing_columns:
-            try:
-                cursor.execute(f'ALTER TABLE jobs ADD COLUMN {column_name} {column_def}')
-                print(f"[DB] Added missing column: {column_name}")
-            except sqlite3.OperationalError as e:
-                print(f"[DB] Error adding column {column_name}: {e}")
     
     conn.commit()
     conn.close()
@@ -300,56 +265,3 @@ def get_job_by_id(job_id):
     
     conn.close()
     return dict(job) if job else None
-
-def get_user_jobs(user_id):
-    """Retrieve all jobs created by a specific user."""
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT * FROM jobs WHERE user_id = ? ORDER BY created_at DESC', (user_id,))
-    jobs = [dict(row) for row in cursor.fetchall()]
-    
-    conn.close()
-    return jobs
-
-def save_job(title, company, location, pay, description, user_id, skills='unknown', posting_date=None):
-    """Save a new job to the database."""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    if posting_date is None:
-        posting_date = datetime.now().strftime('%Y-%m-%d')
-    
-    # Default skills to 'unknown' if not provided or empty
-    if not skills:
-        skills = 'unknown'
-    
-    now = datetime.now().isoformat()
-    
-    cursor.execute('''
-        INSERT INTO jobs (title, company, location, pay, posting_date, description, skills, user_id, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (title, company, location, pay, posting_date, description, skills, user_id, now, now))
-    
-    conn.commit()
-    job_id = cursor.lastrowid
-    conn.close()
-    
-    return job_id
-
-def update_job(job_id, title, company, location, pay, description):
-    """Update an existing job."""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    now = datetime.now().isoformat()
-    
-    cursor.execute('''
-        UPDATE jobs 
-        SET title = ?, company = ?, location = ?, pay = ?, description = ?, updated_at = ?
-        WHERE id = ?
-    ''', (title, company, location, pay, description, now, job_id))
-    
-    conn.commit()
-    conn.close()
