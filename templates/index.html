@@ -3,6 +3,75 @@
 {% block title %}Home - Job Trends{% endblock %}
 
 {% block custom_styles %}
+    header {
+        display: none !important;
+    }
+
+    nav {
+        display: none !important;
+    }
+
+    /* Navbar Container */
+    .auth-navbar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        z-index: 1000;
+        padding: 16px 24px;
+        background: transparent;
+        border: none;
+    }
+
+    .auth-icon-button {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        background: transparent;
+        border: none;
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        font-weight: 600;
+        color: white;
+    }
+
+    @keyframes pulse-green {
+        0%, 100% {
+            box-shadow: 0 0 15px #667eea, 0 0 30px rgba(102, 126, 234, 0.6);
+        }
+        50% {
+            box-shadow: 0 0 25px #667eea, 0 0 50px rgba(102, 126, 234, 0.9);
+        }
+    }
+
+    @keyframes pulse-red {
+        0%, 100% {
+            box-shadow: 0 0 15px #ff0000, 0 0 30px rgba(255, 0, 0, 0.6);
+        }
+        50% {
+            box-shadow: 0 0 25px #ff0000, 0 0 50px rgba(255, 0, 0, 0.9);
+        }
+    }
+
+    .auth-icon-button.authenticated {
+        background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+        animation: pulse-green 2s ease-in-out infinite;
+    }
+
+    .auth-icon-button.not-authenticated {
+        background: #ff0000;
+        animation: pulse-red 2s ease-in-out infinite;
+    }
+
+    .auth-icon-button:hover {
+        transform: scale(1.15);
+        filter: brightness(1.2);
+    }
 
     .auth-icon-button.authenticated:hover {
         box-shadow: 0 0 20px #00ff00, 0 0 40px rgba(0, 255, 0, 0.8);
@@ -66,7 +135,6 @@
         width: 100%;
         max-width: 600px;
         margin: 0 auto;
-        padding-top: 50px;
     }
 
     .hero {
@@ -186,31 +254,78 @@
 {% endblock %}
 
 {% block content %}
-<!-- Sidebar Menu is in base.html -->
+<!-- Auth Navbar - Top Right Corner -->
+<div class="auth-navbar">
+    <button class="auth-icon-button" id="authIconButton" title="Authentication">
+        👤
+        <div class="auth-tooltip" id="authTooltip"></div>
+    </button>
+</div>
 
 <div class="container">
     <div class="hero">
         <div class="greeting">Mimis</div>
         <div class="subtitle">Generate insights on job postings using natural language</div>
-        <button id="customDataBtn" class="custom-button" disabled>Use Custom Data</button>
+        <button id="customDataBtn" class="custom-button" disabled onclick="if(!this.disabled) alert('Custom data feature coming soon!')">Use Custom Data</button>
         <br>
         <a href="/demo" class="demo-button">Use Demo Data</a>
     </div>
 </div>
 
 <script>
-    // Add click handler for custom data button
-    document.addEventListener('DOMContentLoaded', function() {
-        const customDataBtn = document.getElementById('customDataBtn');
-        if (customDataBtn) {
-            customDataBtn.addEventListener('click', function(e) {
-                if (!this.disabled) {
-                    window.location.href = '/data';
-                } else {
-                    e.preventDefault();
+    // Check authentication status on page load
+    async function checkAuthStatus() {
+        try {
+            const response = await fetch('/api/auth/status');
+            const data = await response.json();
+            
+            const authIconButton = document.getElementById('authIconButton');
+            const authTooltip = document.getElementById('authTooltip');
+            const customDataBtn = document.getElementById('customDataBtn');
+            
+            if (data.authenticated) {
+                // User is authenticated - green button
+                authIconButton.classList.add('authenticated');
+                authIconButton.classList.remove('not-authenticated');
+                authTooltip.textContent = `Signout (${data.user_name})`;
+                authIconButton.onclick = () => window.location.href = '/auth/logout';
+                
+                // Enable custom data button
+                if (customDataBtn) {
+                    customDataBtn.disabled = false;
                 }
-            });
+            } else {
+                // User is not authenticated - red button
+                authIconButton.classList.add('not-authenticated');
+                authIconButton.classList.remove('authenticated');
+                authTooltip.textContent = 'Login';
+                authIconButton.onclick = () => window.location.href = '/auth/login';
+                
+                // Disable custom data button
+                if (customDataBtn) {
+                    customDataBtn.disabled = true;
+                }
+            }
+        } catch (error) {
+            console.error('Error checking auth status:', error);
+            // Default to not authenticated if check fails
+            const authIconButton = document.getElementById('authIconButton');
+            const authTooltip = document.getElementById('authTooltip');
+            const customDataBtn = document.getElementById('customDataBtn');
+            
+            authIconButton.classList.add('not-authenticated');
+            authIconButton.classList.remove('authenticated');
+            authTooltip.textContent = 'Login';
+            authIconButton.onclick = () => window.location.href = '/auth/login';
+            
+            // Disable custom data button
+            if (customDataBtn) {
+                customDataBtn.disabled = true;
+            }
         }
-    });
+    }
+
+    // Check auth status when page loads
+    document.addEventListener('DOMContentLoaded', checkAuthStatus);
 </script>
 {% endblock %}
