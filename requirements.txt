@@ -1,6 +1,6 @@
 Flask==3.0.0
 Gunicorn==21.2.0
-python-dotenv==1.0.0
+python-dotenv==1.2.2
 Werkzeug==3.0.1
 google-generativeai==0.3.0
 msal==1.28.0
